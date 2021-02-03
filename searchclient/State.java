@@ -98,6 +98,11 @@ public class State
                     this.agentRows[agent] += action.agentRowDelta;
                     this.agentCols[agent] += action.agentColDelta;
                     break;
+
+                case Push:
+                    this.agentRows[agent] += action.agentRowDelta;
+                    this.agentCols[agent] += action.agentColDelta;
+
             }
         }
     }
@@ -214,6 +219,16 @@ public class State
                 destinationCol = agentCol + action.agentColDelta;
                 return this.cellIsFree(destinationRow, destinationCol);
 
+            case Push:
+                destinationRow = agentRow + action.agentRowDelta;
+                destinationCol = agentCol + action.agentColDelta;
+                boxRow = destinationRow + action.boxRowDelta;
+                boxCol = destinationCol + action.boxColDelta;
+                this.cellIsFree(boxRow,boxCol);
+                return this.cellIsFree(destinationRow, destinationCol);
+
+                
+
         }
 
         // Unreachable:
@@ -235,8 +250,8 @@ public class State
             Action action = jointAction[agent];
             int agentRow = this.agentRows[agent];
             int agentCol = this.agentCols[agent];
-            int boxRow;
-            int boxCol;
+            int boxRow = boxRows[agent];
+            int boxCol = boxCols[agent];
 
             switch (action.type)
             {
@@ -246,8 +261,17 @@ public class State
                 case Move:
                     destinationRows[agent] = agentRow + action.agentRowDelta;
                     destinationCols[agent] = agentCol + action.agentColDelta;
-                    boxRows[agent] = agentRow; // Distinct dummy value
-                    boxCols[agent] = agentCol; // Distinct dummy value
+                    boxRows[agent] = boxRow; // Distinct dummy value
+                    boxCols[agent] = boxCol; // Distinct dummy value
+                    break;
+
+
+                case Push:
+                    destinationRows[agent] = agentRow + action.agentRowDelta;
+                    destinationCols[agent] = agentCol + action.agentColDelta;
+                    boxRows[agent] = agentRow + action.boxRowDelta;
+                    boxCols[agent] = agentCol + action.boxColDelta;
+
                     break;
            }
         }

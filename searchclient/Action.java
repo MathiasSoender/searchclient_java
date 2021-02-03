@@ -3,7 +3,8 @@ package searchclient;
 enum ActionType
 {
     NoOp,
-    Move
+    Move,
+    Push
 }
 
 public enum Action
@@ -27,7 +28,22 @@ public enum Action
     MoveN("Move(N)", ActionType.Move, -1, 0, 0, 0),
     MoveS("Move(S)", ActionType.Move, 1, 0, 0, 0),
     MoveE("Move(E)", ActionType.Move, 0, 1, 0, 0),
-    MoveW("Move(W)", ActionType.Move, 0, -1, 0, 0);
+    MoveW("Move(W)", ActionType.Move, 0, -1, 0, 0),
+
+    PushNE("Push(N,E)", ActionType.Move, -1, 0, 0, 1),
+    PushNN("Push(N,N)", ActionType.Move, -1, 0, -1, 0),
+    PushNW("Push(N,E)", ActionType.Move, -1, 0, 0, -1),
+    PushSS("Push(S,S)", ActionType.Move, 1, 0, 1, 0),
+    PushSE("Push(S,E)", ActionType.Move, 1, 0, 0, 1),
+    PushSW("Push(S,W)", ActionType.Move, 1, 0, 0, -1),
+    PushEE("Push(E,E)", ActionType.Move, 0, 1, 0, 1),
+    PushEN("Push(E,N)", ActionType.Move, 0, 1, -1, 0),
+    PushES("Push(E,S)", ActionType.Move, 0, 1, 1, 0),
+    PushWW("Push(W,W)", ActionType.Move, 0, -1, 0, -1),
+    PushWN("Push(W,N)", ActionType.Move, 0, -1, -1, 0),
+    PushWS("Push(W,S)", ActionType.Move, 0, -1, 1, 0);
+
+
 
     public final String name;
     public final ActionType type;
