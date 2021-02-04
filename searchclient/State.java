@@ -68,6 +68,7 @@ public class State
     // Precondition: Joint action must be applicable and non-conflicting in parent state.
     private State(State parent, Action[] jointAction)
     {
+
         // Copy parent
         this.agentRows = Arrays.copyOf(parent.agentRows, parent.agentRows.length);
         this.agentCols = Arrays.copyOf(parent.agentCols, parent.agentCols.length);
@@ -75,7 +76,14 @@ public class State
         for (int i = 0; i < parent.boxes.length; i++)
         {
             this.boxes[i] = Arrays.copyOf(parent.boxes[i], parent.boxes[i].length);
+            for (int j=0; j<boxes[i].length; j++) {
+                if (this.boxes[i][j]!=0) {
+                System.out.println(i+ " "+ j +" "+ this.boxes[i][j]);}
+            }
+
+
         }
+
 
         // Set own parameters
         this.parent = parent;
@@ -102,9 +110,14 @@ public class State
                 case Push:
                     this.agentRows[agent] += action.agentRowDelta;
                     this.agentCols[agent] += action.agentColDelta;
+                    box = boxes[agentRows[agent]][agentCols[agent]];
+                    this.boxes[agentRows[agent]][agentCols[agent]] = 0;
+                    this.boxes[agentRows[agent]+ action.boxRowDelta][agentCols[agent]+action.boxColDelta]=box;
+                    break;
 
             }
         }
+
     }
 
     public int g()
@@ -220,12 +233,18 @@ public class State
                 return this.cellIsFree(destinationRow, destinationCol);
 
             case Push:
+
                 destinationRow = agentRow + action.agentRowDelta;
                 destinationCol = agentCol + action.agentColDelta;
+
                 boxRow = destinationRow + action.boxRowDelta;
                 boxCol = destinationCol + action.boxColDelta;
-                this.cellIsFree(boxRow,boxCol);
-                return this.cellIsFree(destinationRow, destinationCol);
+                box = this.boxes[destinationRow][destinationCol];
+                return box!=0 && this.cellIsFree(boxRow, boxCol);
+
+
+
+
 
                 
 
@@ -250,8 +269,8 @@ public class State
             Action action = jointAction[agent];
             int agentRow = this.agentRows[agent];
             int agentCol = this.agentCols[agent];
-            int boxRow = boxRows[agent];
-            int boxCol = boxCols[agent];
+            int boxRow;
+            int boxCol;
 
             switch (action.type)
             {
@@ -261,18 +280,20 @@ public class State
                 case Move:
                     destinationRows[agent] = agentRow + action.agentRowDelta;
                     destinationCols[agent] = agentCol + action.agentColDelta;
-                    boxRows[agent] = boxRow; // Distinct dummy value
-                    boxCols[agent] = boxCol; // Distinct dummy value
+                    boxRows[agent] = agentRow; // Distinct dummy value
+                    boxCols[agent] = agentCol; // Distinct dummy value
                     break;
 
 
                 case Push:
                     destinationRows[agent] = agentRow + action.agentRowDelta;
                     destinationCols[agent] = agentCol + action.agentColDelta;
-                    boxRows[agent] = agentRow + action.boxRowDelta;
-                    boxCols[agent] = agentCol + action.boxColDelta;
+                    boxRows[agent] = destinationRows[agent]+ action.boxRowDelta;
+                    boxCols[agent] = destinationCols[agent] + action.boxColDelta;
 
                     break;
+
+
            }
         }
 
@@ -290,11 +311,30 @@ public class State
                     continue;
                 }
 
-                // Moving into same cell?
+                // Two agents Moving into same cell?
                 if (destinationRows[a1] == destinationRows[a2] && destinationCols[a1] == destinationCols[a2])
                 {
                     return true;
                 }
+
+                // Two boxes Moving into same cell?
+                if (boxRows[a1] == boxRows[a2] && boxCols[a1] == boxCols[a2])
+                {
+                    return true;
+                }
+
+                // Box and agent Moving into same cell?
+                if (boxRows[a1] == destinationRows[a2] && boxCols[a1] == destinationCols[a2])
+                {
+                    return true;
+                }
+
+                if (boxRows[a2] == destinationRows[a1] && boxCols[a2] == destinationCols[a1])
+                {
+                    return true;
+                }
+
+
             }
         }
 
@@ -303,8 +343,12 @@ public class State
 
     private boolean cellIsFree(int row, int col)
     {
-        return !this.walls[row][col] && this.boxes[row][col] == 0 && this.agentAt(row, col) == 0;
+        if (row<boxes.length && row>=0 && col>=0 && col<boxes[0].length) {
+        return !this.walls[row][col] && this.boxes[row][col] == 0 && this.agentAt(row, col) == 0;}
+        else return false;
     }
+
+
 
     private char agentAt(int row, int col)
     {

@@ -30,7 +30,7 @@ Memory settings:
     The -Xmx option sets the maximum size of the heap, i.e. how much memory your program can allocate.
     The -Xms option sets the initial size of the heap.
     To set the max heap size to 2GB:
-        $ java -jar ../server.jar -l ../levels/SAD1.lvl -c "java -Xmx2048m searchclient.SearchClient" -g -s 150 -t 180
+        $ java -jar server.jar -l levels/MAPF00.lvl -c "java -Xmx2048m searchclient.SearchClient" -g -s 150 -t 180
         $ java -jar ../server.jar -l ../levels/SAD1.lvl -c "java -Xmx2g searchclient.SearchClient" -g -s 150 -t 180
     Note that this option is set for the *client*.
     Avoid setting max heap size too high, since it will lead to your OS doing memory swapping which is terribly slow.
@@ -39,4 +39,4 @@ Rendering on Unix systems:
     You may experience poor performance when rendering on some Unix systems, because hardware rendering is not enabled by default.
     To enable OpenGL hardware acceleration you should use the following JVM option: -Dsun.java2d.opengl=true
     Note that this JVM option must be set in the Java command that invokes the *server*:
-        $ java -Dsun.java2d.opengl=true -jar ../server.jar -l ../levels/SAD1.lvl -c "java searchclient.SearchClient" -g -s 150 -t 180
+        $ java -Dsun.java2d.opengl=true -jar server.jar -l levels/MAPF00.lvl -c "java searchclient.SearchClient" -g -s 150 -t 180

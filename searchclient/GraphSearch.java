@@ -16,6 +16,7 @@ public class GraphSearch {
             //Try to solve a few levels by hand, enter the found solutions below, and run them:
 
             return new Action[][] {
+                    /*
                 {Action.MoveE},
                 {Action.MoveE},
                 {Action.MoveE},
@@ -30,7 +31,25 @@ public class GraphSearch {
                 {Action.MoveE},
                 {Action.MoveS},
                 {Action.MoveS},
-
+*/
+                    {Action.PushSS},
+                    {Action.PushSS},
+                    {Action.MoveE},
+                    {Action.MoveE},
+                    {Action.MoveE},
+                    {Action.MoveE},
+                    {Action.MoveE},
+                    {Action.MoveE},
+                    {Action.MoveE},
+                    {Action.MoveE},
+                    {Action.MoveE},
+                    {Action.MoveE},
+                    {Action.MoveE},
+                    {Action.MoveE},
+                    {Action.MoveE},
+                    {Action.MoveE},
+                    {Action.MoveE},
+                    {Action.MoveE}
             };
         } else {
 
@@ -71,6 +90,7 @@ public class GraphSearch {
                 }
 
                 explored.add(currentState);
+
 
                 for(State child: currentState.getExpandedStates()){
                     if (!frontier.contains(child) && !explored.contains(child)){
