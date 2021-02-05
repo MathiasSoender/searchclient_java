@@ -4,7 +4,8 @@ enum ActionType
 {
     NoOp,
     Move,
-    Push
+    Push,
+    Pull
 }
 
 public enum Action
@@ -42,7 +43,20 @@ public enum Action
     PushES("Push(E,S)", ActionType.Push, 0, 1, 1, 0),
     PushWW("Push(W,W)", ActionType.Push, 0, -1, 0, -1),
     PushWN("Push(W,N)", ActionType.Push, 0, -1, -1, 0),
-    PushWS("Push(W,S)", ActionType.Push, 0, -1, 1, 0);
+    PushWS("Push(W,S)", ActionType.Push, 0, -1, 1, 0),
+
+    PullNE("Pull(N,E)", ActionType.Pull, 1, 0, 0, -1),
+    PullNN("Pull(N,N)", ActionType.Pull, 1, 0, 1, 0),
+    PullNW("Pull(N,E)", ActionType.Pull, 1, 0, 0, 1),
+    PullSS("Pull(S,S)", ActionType.Pull, -1, 0, -1, 0),
+    PullSE("Pull(S,E)", ActionType.Pull, -1, 0, 0, -1),
+    PullSW("Pull(S,W)", ActionType.Pull, -1, 0, 0, 1),
+    PullEE("Pull(E,E)", ActionType.Pull, 0, -1, 0, -1),
+    PullEN("Pull(E,N)", ActionType.Pull, 0, -1, 1, 0),
+    PullES("Pull(E,S)", ActionType.Pull, 0, -1, -1, 0),
+    PullWW("Pull(W,W)", ActionType.Pull, 0, 1, 0, 1),
+    PullWN("Pull(W,N)", ActionType.Pull, 0, 1, 1, 0),
+    PullWS("Pull(W,S)", ActionType.Pull, 0, 1, -1, 0);
 
 
 

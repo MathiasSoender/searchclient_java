@@ -76,12 +76,6 @@ public class State
         for (int i = 0; i < parent.boxes.length; i++)
         {
             this.boxes[i] = Arrays.copyOf(parent.boxes[i], parent.boxes[i].length);
-            for (int j=0; j<boxes[i].length; j++) {
-                if (this.boxes[i][j]!=0) {
-                System.out.println(i+ " "+ j +" "+ this.boxes[i][j]);}
-            }
-
-
         }
 
 
@@ -112,8 +106,20 @@ public class State
                     this.agentCols[agent] += action.agentColDelta;
                     box = boxes[agentRows[agent]][agentCols[agent]];
                     this.boxes[agentRows[agent]][agentCols[agent]] = 0;
-                    this.boxes[agentRows[agent]+ action.boxRowDelta][agentCols[agent]+action.boxColDelta]=box;
+                    this.boxes[agentRows[agent]+ action.boxRowDelta][agentCols[agent]+action.boxColDelta] =box;
                     break;
+
+                case Pull:
+                    box = boxes[agentRows[agent]- action.agentRowDelta][agentCols[agent]- action.agentColDelta];
+                    this.boxes[agentRows[agent]- action.agentRowDelta][agentCols[agent]- action.agentColDelta] = 0;
+                    this.boxes[agentRows[agent]][agentCols[agent]] =box;
+
+                    this.agentRows[agent] += action.agentRowDelta;
+                    this.agentCols[agent] += action.agentColDelta;
+
+
+                    break;
+
 
             }
         }
@@ -233,15 +239,30 @@ public class State
                 return this.cellIsFree(destinationRow, destinationCol);
 
             case Push:
-
                 destinationRow = agentRow + action.agentRowDelta;
                 destinationCol = agentCol + action.agentColDelta;
 
                 boxRow = destinationRow + action.boxRowDelta;
                 boxCol = destinationCol + action.boxColDelta;
                 box = this.boxes[destinationRow][destinationCol];
-                return box!=0 && this.cellIsFree(boxRow, boxCol);
+                if (boxRow<boxes.length && boxRow>=0 && boxCol>=0 && boxCol<boxes[0].length && box!=0) {
+                    // Boolean color = (agentColor.toString() == boxColors[Character.getNumericValue(box)].toString());
+                    return this.cellIsFree(boxRow, boxCol); //&& color; //&& agentColor.toString()==boxColors[box].toString();
+                }
+                else return false;
 
+            case Pull:
+                destinationRow = agentRow + action.agentRowDelta;
+                destinationCol = agentCol + action.agentColDelta;
+
+                boxRow = destinationRow ;
+                boxCol = destinationCol ;
+                box = this.boxes[destinationRow-action.boxRowDelta][destinationCol-action.boxColDelta];
+                if (boxRow<boxes.length && boxRow>=0 && boxCol>=0 && boxCol<boxes[0].length && box!=0) {
+                   // Boolean color = (agentColor.toString() == boxColors[Character.getNumericValue(box)].toString());
+                    return this.cellIsFree(boxRow, boxCol); //&& color; //&& agentColor.toString()==boxColors[box].toString();
+                }
+                else return false;
 
 
 
@@ -285,11 +306,20 @@ public class State
                     break;
 
 
+
                 case Push:
                     destinationRows[agent] = agentRow + action.agentRowDelta;
                     destinationCols[agent] = agentCol + action.agentColDelta;
                     boxRows[agent] = destinationRows[agent]+ action.boxRowDelta;
                     boxCols[agent] = destinationCols[agent] + action.boxColDelta;
+
+                    break;
+
+                case Pull:
+                    destinationRows[agent] = agentRow + action.agentRowDelta;
+                    destinationCols[agent] = agentCol + action.agentColDelta;
+                    boxRows[agent] = agentRow;
+                    boxCols[agent] = agentCol;
 
                     break;
 
@@ -343,9 +373,8 @@ public class State
 
     private boolean cellIsFree(int row, int col)
     {
-        if (row<boxes.length && row>=0 && col>=0 && col<boxes[0].length) {
-        return !this.walls[row][col] && this.boxes[row][col] == 0 && this.agentAt(row, col) == 0;}
-        else return false;
+
+        return !this.walls[row][col] && this.boxes[row][col] == 0 && this.agentAt(row, col) == 0;
     }
 
 

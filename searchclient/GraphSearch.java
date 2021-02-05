@@ -33,6 +33,8 @@ public class GraphSearch {
                 {Action.MoveS},
 */
                     {Action.PushSS},
+                    {Action.PullNN},
+                    {Action.PushSS},
                     {Action.PushSS},
                     {Action.MoveE},
                     {Action.MoveE},
