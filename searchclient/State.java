@@ -244,7 +244,7 @@ public class State
                 boxRow = destinationRow + action.boxRowDelta;
                 boxCol = destinationCol + action.boxColDelta;
                 box = this.boxes[destinationRow][destinationCol];
-                if (boxRow<boxes.length && boxRow>=0 && boxCol>=0 && boxCol<boxes[0].length && box!=0) {
+                if (boxRow<walls.length && boxRow>=0 && boxCol>=0 && boxCol<walls[0].length && box!=0) {
                     Boolean color = (agentColor.toString() == boxColors[agent].toString());
                     return this.cellIsFree(boxRow, boxCol); //&& color; //&& agentColor.toString()==boxColors[box].toString();
                 }
@@ -254,12 +254,14 @@ public class State
                 destinationRow = agentRow + action.agentRowDelta;
                 destinationCol = agentCol + action.agentColDelta;
 
-                boxRow = destinationRow ;
-                boxCol = destinationCol ;
-                box = this.boxes[destinationRow-action.boxRowDelta][destinationCol-action.boxColDelta];
-                if (boxRow<boxes.length && boxRow>=0 && boxCol>=0 && boxCol<boxes[0].length && box!=0) {
-                    //Boolean color = (agentColor.toString() == boxColors[agent].toString());
-                    return this.cellIsFree(boxRow, boxCol); //&& agentColor.toString()==boxColors[box].toString();
+                boxRow = agentRow ;
+                boxCol = agentCol ;
+                box = this.boxes[boxRow-action.boxRowDelta][boxCol-action.boxColDelta];
+
+                if (destinationRow<walls.length && destinationRow>=0 && destinationCol>=0 && destinationCol<walls[0].length && box!=0) {
+
+                    return this.cellIsFree(destinationRow, destinationCol); //&& agentColor.toString()==boxColors[box].toString();
+
                 }
                 else return false;
 
@@ -304,22 +306,19 @@ public class State
                     boxCols[agent] = agentCol; // Distinct dummy value
                     break;
 
-
-
                 case Push:
                     destinationRows[agent] = agentRow + action.agentRowDelta;
                     destinationCols[agent] = agentCol + action.agentColDelta;
-                    boxRows[agent] = destinationRows[agent]+ action.boxRowDelta;
+                    boxRows[agent] = destinationRows[agent] + action.boxRowDelta;
                     boxCols[agent] = destinationCols[agent] + action.boxColDelta;
 
                     break;
 
                 case Pull:
-                    destinationRows[agent] = agentRow + action.agentRowDelta;
-                    destinationCols[agent] = agentCol + action.agentColDelta;
                     boxRows[agent] = agentRow;
                     boxCols[agent] = agentCol;
-
+                    destinationRows[agent] = agentRow + action.agentRowDelta;
+                    destinationCols[agent] = agentCol + action.agentColDelta;
                     break;
 
 
