@@ -76,6 +76,7 @@ public class GraphSearch {
                 // Is not empty, take a new frontier state.
                 State currentState = frontier.pop();
                 if (currentState.isGoalState()){
+                    printSearchStatus(explored, frontier);
                     return currentState.extractPlan();
                 }
 

@@ -9,7 +9,7 @@ public abstract class Heuristic
     {
         // Here's a chance to pre-process the static parts of the level.
     }
-
+    // How many goal cells are not yet covered by an object of the right type.
     public int h(State s)
     {
         throw new NotImplementedException();

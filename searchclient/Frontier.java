@@ -109,6 +109,8 @@ class FrontierBestFirst
         implements Frontier
 {
     private Heuristic heuristic;
+    private final PriorityQueue<State> pqueue = new PriorityQueue<>(this.heuristic);
+    private final HashSet<State> set = new HashSet<>();
 
     public FrontierBestFirst(Heuristic h)
     {
@@ -118,31 +120,34 @@ class FrontierBestFirst
     @Override
     public void add(State state)
     {
-        throw new NotImplementedException();
+        pqueue.add(state);
+        set.add(state);
     }
 
     @Override
     public State pop()
     {
-        throw new NotImplementedException();
+        State state = pqueue.poll();
+        set.remove(state);
+        return state;
     }
 
     @Override
     public boolean isEmpty()
     {
-        throw new NotImplementedException();
+        return pqueue.isEmpty();
     }
 
     @Override
     public int size()
     {
-        throw new NotImplementedException();
+        return pqueue.size();
     }
 
     @Override
     public boolean contains(State state)
     {
-        throw new NotImplementedException();
+        return set.contains(state);
     }
 
     @Override
