@@ -173,7 +173,10 @@ public class SearchClient
                     frontier = new FrontierBestFirst(new HeuristicWeightedAStar(initialState, w));
                     break;
                 case "-greedy":
-                    frontier = new FrontierBestFirst(new HeuristicGreedy(initialState));
+                    frontier = new FrontierBestFirst(new HeuristicSuggestion(initialState));
+                    break;
+                case "-suggestion":
+                    frontier = new FrontierBestFirst(new HeuristicSuggestion(initialState));
                     break;
                 default:
                     frontier = new FrontierBFS();
