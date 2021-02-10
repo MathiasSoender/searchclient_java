@@ -12,7 +12,27 @@ public abstract class Heuristic
     // How many goal cells are not yet covered by an object of the right type.
     public int h(State s)
     {
-        throw new NotImplementedException();
+        int goalcells = 0;
+        for (int row = 1; row < s.goals.length - 1; row++)
+        {
+            for (int col = 1; col < s.goals[row].length - 1; col++)
+            {
+                char goal = s.goals[row][col];
+
+                if ('A' <= goal && goal <= 'Z' && s.boxes[row][col] != goal)
+                {
+                    goalcells+=1;
+                }
+                else if ('0' <= goal && goal <= '9' &&
+                        !(s.agentRows[goal - '0'] == row && s.agentCols[goal - '0'] == col))
+                {
+                    goalcells+=1;
+                }
+            }
+        }
+        return goalcells;
+
+        //throw new NotImplementedException();
     }
 
     public abstract int f(State s);
@@ -73,6 +93,26 @@ class HeuristicGreedy
         extends Heuristic
 {
     public HeuristicGreedy(State initialState)
+    {
+        super(initialState);
+    }
+
+    @Override
+    public int f(State s)
+    {
+        return this.h(s);
+    }
+
+    @Override
+    public String toString()
+    {
+        return "greedy evaluation";
+    }
+}
+class HeuristicSuggestion
+        extends Heuristic
+{
+    public HeuristicSuggestion(State initialState)
     {
         super(initialState);
     }
