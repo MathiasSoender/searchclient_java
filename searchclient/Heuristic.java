@@ -2,41 +2,45 @@ package searchclient;
 
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.HashMap;
+import java.util.LinkedList;
 
-import static java.lang.Math.min;
-import static java.lang.Math.sqrt;
+import static java.lang.Math.*;
 
 public abstract class Heuristic
         implements Comparator<State>
 {
+    HashMap<Integer[][],Character> goalmap;
+
+
     public Heuristic(State initialState)
     {
-        // Here's a chance to pre-process the static parts of the level.
+        goalmap = new HashMap<Integer[][], Character>();
+        for (int row = 0; row < initialState.goals.length - 1; row++) {
+            for (int col = 0; col < initialState.goals[row].length - 1; col++) {
+
+                char goal = initialState.goals[row][col];
+                if (goal != 0){
+                    System.out.println(goalmap.size());
+                    goalmap.put(new Integer[row][col], goal);
+                }
+            }
+        }
     }
     // How many goal cells are not yet covered by an object of the right type.
     public int h(State s)
     {
-
-        int goalcells = 0;
-        for (int row = 1; row < s.goals.length - 1; row++)
-        {
-            for (int col = 1; col < s.goals[row].length - 1; col++)
-            {
+        int count = goalmap.size();
+        for (int row = 0; row < s.goals.length; row++) {
+            for (int col = 0; col < s.goals[row].length; col++) {
                 char goal = s.goals[row][col];
-
-                if ('A' <= goal && goal <= 'Z' && s.boxes[row][col] != goal)
-                {
-                    goalcells+=1;
-                }
-                else if ('0' <= goal && goal <= '9' &&
-                        !(s.agentRows[goal - '0'] == row && s.agentCols[goal - '0'] == col))
-                {
-                    goalcells+=1;
+                char box = Character.toLowerCase(s.boxes[row][col]);
+                if (goal > 0 && box == goal){
+                    count--;
                 }
             }
         }
-        return goalcells;
-
+        return count;
     }
 
     public int h_own(State s) {
@@ -144,6 +148,7 @@ class HeuristicGreedy
         return "greedy evaluation";
     }
 }
+
 class HeuristicSuggestionGreedy
         extends Heuristic
 {
