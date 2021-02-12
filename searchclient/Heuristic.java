@@ -21,7 +21,6 @@ public abstract class Heuristic
 
                 char goal = initialState.goals[row][col];
                 if (goal != 0){
-                    System.out.println(goalmap.size());
                     goalmap.put(new Integer[row][col], goal);
                 }
             }
