@@ -123,6 +123,7 @@ class FrontierBestFirst
     public void add(State state)
     {
         this.pqueue.add(state);
+
         this.set.add(state);
     }
 
