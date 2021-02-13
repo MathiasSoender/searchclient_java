@@ -3,13 +3,12 @@ package searchclient;
 import java.util.*;
 
 import static java.lang.Math.min;
-import static java.lang.Math.sqrt;
 
 public abstract class Heuristic
         implements Comparator<State>
 {
-    Graph<String> graph = new Graph<String>();
     HashMap<Integer[][],Character> goalmap;
+    Graph<String> graph = new Graph<String>();
 
     public Heuristic(State initialState)
     {
@@ -24,6 +23,33 @@ public abstract class Heuristic
             }
         }
 
+
+
+    }
+
+    public void createGraph(State initialState) {
+        //creating a graph, to find the shortest path efficiently
+
+        for(int i =1; i<initialState.walls.length; i++) {
+            for (int j=1; j<initialState.walls[0].length;j++) {
+                if (!initialState.walls[i][j]) {
+                    String vertex = i+" "+j;
+                    graph.addVertex(vertex);
+                    if (j!=1){
+                        int new_j = j-1;
+                        if (!initialState.walls[i][new_j]) {
+                            graph.addEdge(i+" "+new_j,vertex,true);
+                        }
+                    }
+                    if (i!=1) {
+                        int new_i = i-1;
+                        if (!initialState.walls[new_i][j]){
+                            graph.addEdge(new_i+" "+j,vertex,true);
+                        }
+                    }
+                }
+            }
+        }
 
 
     }
@@ -45,7 +71,68 @@ public abstract class Heuristic
 
     }
 
-    public int h_own(State s) {
+    public int breathFirstTraversal(Graph graph, String root, String goal) {
+        Set<String> visited = new LinkedHashSet<String>();
+        Deque<String> queue = new ArrayDeque<>();
+        Deque<Integer> depth = new ArrayDeque<>();
+
+        queue.push(root);
+        depth.push(0);
+        Integer depthint = 0;
+
+        while (!queue.isEmpty()) {
+            String vertex = queue.pollFirst();
+            depthint = depth.pollFirst();
+            if (vertex.equals(goal)) {
+                return depthint;
+            }
+            if (!visited.contains(vertex)) {
+                visited.add(vertex);
+                for (Object v : graph.getAdjacent(vertex)) {
+                    queue.addLast((String) v);
+                    depth.addLast(depthint+1);
+
+                }
+            }
+        }
+
+        return depthint;
+    }
+
+    public int h_shortestdistance(State s) {
+        double distance = 0;
+
+        for (int row = 1; row < s.goals.length - 1; row++)
+        {
+            for (int col = 1; col < s.goals[row].length - 1; col++)
+            {
+                char goal = s.goals[row][col];
+
+                if('A' <= goal && goal <= 'Z') {
+                    for (int i = 0; i < s.boxes.length; i++) {
+                        for (int j = 0; j < s.boxes[i].length; j++) {
+                            if (s.boxes[i][j] == goal) {
+                                Integer agent_to_box = breathFirstTraversal(graph,s.agentRows[0] +" "+s.agentCols[0],i+" "+j);
+                                Integer box_to_goal = breathFirstTraversal(graph,i+" "+j,row+" "+col);
+                                distance += box_to_goal+agent_to_box;
+                            }
+                        }
+                    }
+                }
+
+                else if ('0' <= goal && goal <= '9' &&
+                        !(s.agentRows[goal - '0'] == row && s.agentCols[goal - '0'] == col))
+                {
+                    distance += breathFirstTraversal(graph,s.agentRows[goal - '0'] +" "+s.agentCols[goal - '0'],row+" "+col);
+                }
+            }
+        }
+
+        return (int)distance;
+    }
+
+
+    public int h_manhatten(State s) {
         double manhatten = 0;
 
         for (int row = 1; row < s.goals.length - 1; row++)
@@ -154,125 +241,20 @@ class HeuristicGreedy
 class HeuristicSuggestionGreedy
         extends Heuristic
 {
-    Graph<String> graph = new Graph<String>();
+    //Graph<String> graph = new Graph<String>();
     public HeuristicSuggestionGreedy(State initialState)
     {
         super(initialState);
-        for(int i =1; i<initialState.walls.length; i++) {
-            for (int j=1; j<initialState.walls[0].length;j++) {
-                if (!initialState.walls[i][j]) {
-                    String vertex = i+" "+j;
-
-                    graph.addVertex(vertex);
-
-                    if (j!=1){
-                        int newj = j-1;
-
-                        if (!initialState.walls[i][newj]) {
-
-                            graph.addEdge(i+" "+newj,i+" "+j,true);
-
-                        }
-                    }
-                    if (i!=1) {
-                        int newi = i-1;
-                        if (!initialState.walls[newi][j]){
-                            graph.addEdge(newi+" "+j,i+" "+j,true);
-
-                        }
-                    }
-                }
-
-            }
-        }
+        createGraph(initialState);
 
     }
-    public int depthFirstTraversal(Graph graph, String root, String goal) {
-        Set<String> visited = new LinkedHashSet<String>();
-        Stack<String> stack = new Stack<String>();
-        stack.push(root);
 
-        while (!stack.isEmpty()) {
-            String vertex = stack.pop();
-            if (vertex==goal) {
-
-
-                return visited.size();
-            }
-            if (!visited.contains(vertex)) {
-                visited.add(vertex);
-                for (Object v : graph.getAdjacent(vertex)) {
-                    stack.push((String) v);
-                }
-            }
-        }
-        return visited.size();
-    }
-    public int breathFirstTraversal(Graph graph, String root, String goal) {
-        Set<String> visited = new LinkedHashSet<String>();
-        Deque<String> queue = new ArrayDeque<>();
-        Deque<Integer> depth = new ArrayDeque<>();
-
-        queue.push(root);
-        depth.push(0);
-        Integer depthint = 0;
-
-        while (!queue.isEmpty()) {
-            String vertex = queue.pollFirst();
-            depthint = depth.pollFirst();
-            if (vertex.equals(goal)) {
-                return depthint;
-            }
-            if (!visited.contains(vertex)) {
-                visited.add(vertex);
-                for (Object v : graph.getAdjacent(vertex)) {
-                    queue.addLast((String) v);
-                    depth.addLast(depthint+1);
-
-                }
-            }
-        }
-
-        return depthint;
-    }
-
-    public int h_new(State s) {
-        double manhatten = 0;
-
-        for (int row = 1; row < s.goals.length - 1; row++)
-        {
-            for (int col = 1; col < s.goals[row].length - 1; col++)
-            {
-                char goal = s.goals[row][col];
-
-                if('A' <= goal && goal <= 'Z') {
-                    for (int i = 0; i < s.boxes.length; i++) {
-                        for (int j = 0; j < s.boxes[i].length; j++) {
-                            if (s.boxes[i][j] == goal) {
-                                Integer agent_to_box = breathFirstTraversal(graph,s.agentRows[0] +" "+s.agentCols[0],i+" "+j);
-                                Integer box_to_goal = breathFirstTraversal(graph,i+" "+j,row+" "+col);
-                                manhatten += box_to_goal+agent_to_box;
-                            }
-                        }
-                    }
-                }
-
-                else if ('0' <= goal && goal <= '9' &&
-                        !(s.agentRows[goal - '0'] == row && s.agentCols[goal - '0'] == col))
-                {
-                    manhatten += breathFirstTraversal(graph,s.agentRows[goal - '0'] +" "+s.agentCols[goal - '0'],row+" "+col);
-                }
-            }
-        }
-
-        return (int)manhatten;
-    }
 
 
     @Override
     public int f(State s)
     {
-        return this.h_new(s);
+        return this.h_shortestdistance(s);
 
     }
 
@@ -290,13 +272,14 @@ class HeuristicSuggestionAStar
     public HeuristicSuggestionAStar(State initialState)
     {
         super(initialState);
+        createGraph(initialState);
 
     }
 
     @Override
     public int f(State s)
     {
-        return s.g() + this.h_own(s);
+        return s.g() + this.h_shortestdistance(s);
     }
 
     @Override
