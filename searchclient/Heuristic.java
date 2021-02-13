@@ -1,5 +1,6 @@
 package searchclient;
 
+import java.lang.reflect.Array;
 import java.util.*;
 
 import static java.lang.Math.min;
@@ -9,6 +10,8 @@ public abstract class Heuristic
 {
     HashMap<Integer[][],Character> goalmap;
     Graph<String> graph = new Graph<String>();
+    HashMap<String, Integer> precomputedDistance;
+
 
     public Heuristic(State initialState)
     {
@@ -29,7 +32,7 @@ public abstract class Heuristic
 
     public void createGraph(State initialState) {
         //creating a graph, to find the shortest path efficiently
-
+        precomputedDistance = new HashMap<String, Integer>();
         for(int i =1; i<initialState.walls.length; i++) {
             for (int j=1; j<initialState.walls[0].length;j++) {
                 if (!initialState.walls[i][j]) {
@@ -71,28 +74,53 @@ public abstract class Heuristic
 
     }
 
-    public int breathFirstTraversal(Graph graph, String root, String goal) {
+
+    private int breathFirstTraversal(Graph graph, String root, String goal) {
+
+        if (precomputedDistance.containsKey(root + goal)) return precomputedDistance.get(root+goal);
+        HashMap<String, ArrayList<String>> parents = new HashMap<String, ArrayList<String>>();
+
         Set<String> visited = new LinkedHashSet<String>();
         Deque<String> queue = new ArrayDeque<>();
         Deque<Integer> depth = new ArrayDeque<>();
 
+
         queue.push(root);
         depth.push(0);
         Integer depthint = 0;
+        parents.put(root, new ArrayList<>());
 
         while (!queue.isEmpty()) {
             String vertex = queue.pollFirst();
             depthint = depth.pollFirst();
+
             if (vertex.equals(goal)) {
+                precomputedDistance.put(root+goal, depthint);
+
+                for(String path : parents.get(vertex)){
+                    String[] info = path.split("\\.");
+                    precomputedDistance.put(info[0]+goal, depthint - Integer.parseInt(info[1]));
+
+                }
                 return depthint;
             }
             if (!visited.contains(vertex)) {
                 visited.add(vertex);
+                int minDepth = 0;
                 for (Object v : graph.getAdjacent(vertex)) {
                     queue.addLast((String) v);
                     depth.addLast(depthint+1);
 
+                    ArrayList<String> parentList = (ArrayList<String>) parents.get(vertex).clone();
+                    parentList.add(vertex+"."+depthint);
+                    parents.put((String) v, parentList);
+
+                    if (precomputedDistance.containsKey(v + goal)){
+                        minDepth = Math.min(precomputedDistance.get(v+goal) + depthint+1, minDepth);
+                    }
+
                 }
+                if (minDepth != 0) return minDepth;
             }
         }
 
@@ -101,33 +129,41 @@ public abstract class Heuristic
 
     public int h_shortestdistance(State s) {
         double distance = 0;
+        boolean ignoreOthers = false;
+        double agent_to_box_sum = 0;
+        double box_to_goal_sum = 0;
 
         for (int row = 1; row < s.goals.length - 1; row++)
         {
-            for (int col = 1; col < s.goals[row].length - 1; col++)
-            {
+            for (int col = 1; col < s.goals[row].length - 1; col++) {
                 char goal = s.goals[row][col];
 
-                if('A' <= goal && goal <= 'Z') {
+                if ('A' <= goal && goal <= 'Z') {
                     for (int i = 0; i < s.boxes.length; i++) {
                         for (int j = 0; j < s.boxes[i].length; j++) {
                             if (s.boxes[i][j] == goal) {
-                                Integer agent_to_box = breathFirstTraversal(graph,s.agentRows[0] +" "+s.agentCols[0],i+" "+j);
-                                Integer box_to_goal = breathFirstTraversal(graph,i+" "+j,row+" "+col);
-                                distance += box_to_goal+agent_to_box;
-                            }
+                                int agent_to_box = breathFirstTraversal(graph, s.agentRows[0] + " " + s.agentCols[0], i + " " + j);
+                                int box_to_goal = breathFirstTraversal(graph, i + " " + j, row + " " + col);
+
+                                if (box_to_goal != 0) agent_to_box_sum += agent_to_box;
+                                box_to_goal_sum += box_to_goal;
+
                         }
                     }
                 }
+            }
+
 
                 else if ('0' <= goal && goal <= '9' &&
                         !(s.agentRows[goal - '0'] == row && s.agentCols[goal - '0'] == col))
                 {
-                    distance += breathFirstTraversal(graph,s.agentRows[goal - '0'] +" "+s.agentCols[goal - '0'],row+" "+col);
+                        distance += breathFirstTraversal(graph, s.agentRows[goal - '0'] + " " + s.agentCols[goal - '0'], row + " " + col);
                 }
             }
         }
 
+        distance += box_to_goal_sum;
+        distance += agent_to_box_sum;
         return (int)distance;
     }
 
@@ -172,6 +208,7 @@ public abstract class Heuristic
         return this.f(s1) - this.f(s2);
     }
 }
+
 
 class HeuristicAStar
         extends Heuristic
