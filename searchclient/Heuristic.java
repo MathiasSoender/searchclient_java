@@ -140,21 +140,21 @@ public abstract class Heuristic
                 char goal = s.goals[row][col];
 
                 if ('A' <= goal && goal <= 'Z') {
+                    boolean color = false;
                     for (int i = 0; i < s.boxes.length; i++) {
                         for (int j = 0; j < s.boxes[i].length; j++) {
                             if (s.boxes[i][j] == goal) {
                                 for(int a = 0; a<s.agentRows.length;a++) {
-                                    Boolean color = (s.agentColors[a].toString() == s.boxColors[goal-'A'].toString());
+                                    color = (s.agentColors[a].toString() == s.boxColors[goal-'A'].toString());
                                     if (color) {
                                         fromagent = s.agentRows[a] + " " + s.agentCols[a];
 
 
                                 int agent_to_box = breathFirstTraversal(graph, fromagent, i + " " + j);
                                 int box_to_goal = breathFirstTraversal(graph, i + " " + j, row + " " + col);
-
                                 if (box_to_goal != 0) {
-                                    agent_to_box_sum += agent_to_box;
                                     box_to_goal_sum += box_to_goal;
+                                    agent_to_box_sum += agent_to_box;
                                 }
 
 
@@ -167,6 +167,7 @@ public abstract class Heuristic
 
                         }
                     }
+                    if (color) break;
                 }
             }
 
