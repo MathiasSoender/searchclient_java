@@ -1,5 +1,6 @@
 package searchclient;
 
+import java.awt.geom.Point2D;
 import java.lang.reflect.Array;
 import java.util.*;
 
@@ -8,25 +9,23 @@ import static java.lang.Math.min;
 public abstract class Heuristic
         implements Comparator<State>
 {
-    HashMap<Integer[][],Character> goalmap;
+    HashMap<Character, Point2D> goalmap;
     Graph<String> graph = new Graph<String>();
     HashMap<String, Integer> precomputedDistance;
 
 
     public Heuristic(State initialState)
     {
-        goalmap = new HashMap<Integer[][], Character>();
+        goalmap = new HashMap<Character, Point2D>();
         for (int row = 0; row < initialState.goals.length - 1; row++) {
             for (int col = 0; col < initialState.goals[row].length - 1; col++) {
 
                 char goal = initialState.goals[row][col];
                 if (goal != 0){
-                    goalmap.put(new Integer[row][col], goal);
+                    goalmap.put(goal, new Point2D.Double(row,col));
                 }
             }
         }
-
-
 
     }
 
