@@ -127,8 +127,40 @@ public abstract class Heuristic
         return depthint;
     }
 
-    private boolean checkIfAgentFinished(String agentColor){
-        return true;
+    private boolean checkIfAgentFinished(String agentColor, State s){
+        boolean done = false;
+
+        for (int row = 1; row < s.goals.length - 1; row++)
+        {
+            for (int col = 1; col < s.goals[row].length - 1; col++) {
+                char goal = s.goals[row][col];
+
+                if ('A' <= goal && goal <= 'Z') {
+                    for (int i = 0; i < s.boxes.length; i++) {
+                        for (int j = 0; j < s.boxes[i].length; j++) {
+                            if (s.boxes[i][j] == goal) {
+                                boolean color = (agentColor == s.boxColors[goal-'A'].toString());
+                                if (color) {
+                                    int box_to_goal = breathFirstTraversal(graph, i + " " + j, row + " " + col);
+
+                                    if (box_to_goal == 0){
+                                        done = true;
+                                    }
+                                    else{
+                                        return false;
+                                    }
+
+
+                                }
+
+                            }
+                        }
+                    }
+                }
+
+            }
+        }
+        return done;
     }
 
     public int h_shortestdistance(State s) {
@@ -158,7 +190,7 @@ public abstract class Heuristic
                                 // When finished, ensure agent is close to box
                                 //*0.5 : This is the behavior of agent after finished. If high (>1), the agent will stand still
                                 //If low, the agent will dance a bit (so he does not block)
-                                if (checkIfAgentFinished(s.agentColors[a].toString())) agent_to_box_sum +=
+                                if (checkIfAgentFinished(s.agentColors[a].toString(),s)) agent_to_box_sum +=
                                                                                         agent_to_box * 0.5;
                                 if (box_to_goal != 0) {
                                     box_to_goal_sum += box_to_goal;
