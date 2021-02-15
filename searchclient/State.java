@@ -17,6 +17,7 @@ public class State
     public int[] agentCols;
     public static Color[] agentColors;
 
+
     /*
         The walls, boxes, and goals arrays are indexed from the top-left of the level, row-major order (row, col).
                Col 0  Col 1  Col 2  Col 3
@@ -245,8 +246,16 @@ public class State
                 boxRow = destinationRow + action.boxRowDelta;
                 boxCol = destinationCol + action.boxColDelta;
                 box = this.boxes[destinationRow][destinationCol];
+/**
+                for (int i=0;(i<=boxColors.length);i++) {
+                    System.out.println(boxColors[i]);
+
+
+                }
+ **/
                 if (boxRow<walls.length && boxRow>=0 && boxCol>=0 && boxCol<walls[0].length && box!=0) {
-                    Boolean color = (agentColor.toString() == boxColors[agent].toString());
+
+                    Boolean color =(agentColor.toString() == boxColors[box-'A'].toString());
                     return this.cellIsFree(boxRow, boxCol) && color; //&& agentColor.toString()==boxColors[box].toString();
                 }
                 else return false;
@@ -259,8 +268,9 @@ public class State
                 boxCol = agentCol ;
                 box = this.boxes[boxRow-action.boxRowDelta][boxCol-action.boxColDelta];
 
+
                 if (destinationRow<walls.length && destinationRow>=0 && destinationCol>=0 && destinationCol<walls[0].length && box!=0) {
-                    Boolean color = (agentColor.toString() == boxColors[agent].toString());
+                    Boolean color = (agentColor.toString() == boxColors[box-'A'].toString());
                     return this.cellIsFree(destinationRow, destinationCol) && color; //&& agentColor.toString()==boxColors[box].toString();
 
                 }
