@@ -127,9 +127,12 @@ public abstract class Heuristic
         return depthint;
     }
 
+    private boolean checkIfAgentFinished(String agentColor){
+        return true;
+    }
+
     public int h_shortestdistance(State s) {
         double distance = 0;
-        boolean ignoreOthers = false;
         double agent_to_box_sum = 0;
         double box_to_goal_sum = 0;
         String fromagent = "";
@@ -152,12 +155,15 @@ public abstract class Heuristic
 
                                 int agent_to_box = breathFirstTraversal(graph, fromagent, i + " " + j);
                                 int box_to_goal = breathFirstTraversal(graph, i + " " + j, row + " " + col);
+                                // When finished, ensure agent is close to box
+                                //*0.5 : This is the behavior of agent after finished. If high (>1), the agent will stand still
+                                //If low, the agent will dance a bit (so he does not block)
+                                if (checkIfAgentFinished(s.agentColors[a].toString())) agent_to_box_sum +=
+                                                                                        agent_to_box * 0.5;
                                 if (box_to_goal != 0) {
                                     box_to_goal_sum += box_to_goal;
                                     agent_to_box_sum += agent_to_box;
                                 }
-
-
 
 
                                 break;
@@ -166,7 +172,9 @@ public abstract class Heuristic
                                 }
 
                         }
+                        if (color) break;
                     }
+                        // SOme reasons these breaks increase the complexity signficantly.
                     if (color) break;
                 }
             }
