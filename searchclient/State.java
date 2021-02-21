@@ -246,13 +246,7 @@ public class State
                 boxRow = destinationRow + action.boxRowDelta;
                 boxCol = destinationCol + action.boxColDelta;
                 box = this.boxes[destinationRow][destinationCol];
-/**
-                for (int i=0;(i<=boxColors.length);i++) {
-                    System.out.println(boxColors[i]);
 
-
-                }
- **/
                 if (boxRow<walls.length && boxRow>=0 && boxCol>=0 && boxCol<walls[0].length && box!=0) {
 
                     Boolean color =(agentColor.toString() == boxColors[box-'A'].toString());
