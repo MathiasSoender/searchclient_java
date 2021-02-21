@@ -1,6 +1,5 @@
 package searchclient;
 
-import java.awt.geom.Point2D;
 import java.lang.reflect.Array;
 import java.util.*;
 
@@ -9,29 +8,34 @@ import static java.lang.Math.min;
 public abstract class Heuristic
         implements Comparator<State>
 {
-    HashMap<Character, Point2D> goalmap;
+    HashMap<Integer[][],Character> goalmap;
     Graph<String> graph = new Graph<String>();
     HashMap<String, Integer> precomputedDistance;
+    HashMap<String, Boolean> agentFinished;
+
 
 
     public Heuristic(State initialState)
     {
-        goalmap = new HashMap<Character, Point2D>();
+        goalmap = new HashMap<Integer[][], Character>();
         for (int row = 0; row < initialState.goals.length - 1; row++) {
             for (int col = 0; col < initialState.goals[row].length - 1; col++) {
 
                 char goal = initialState.goals[row][col];
                 if (goal != 0){
-                    goalmap.put(goal, new Point2D.Double(row,col));
+                    goalmap.put(new Integer[row][col], goal);
                 }
             }
         }
+
+
 
     }
 
     public void createGraph(State initialState) {
         //creating a graph, to find the shortest path efficiently
         precomputedDistance = new HashMap<String, Integer>();
+        agentFinished = new HashMap<>();
         for(int i =1; i<initialState.walls.length; i++) {
             for (int j=1; j<initialState.walls[0].length;j++) {
                 if (!initialState.walls[i][j]) {
@@ -52,8 +56,6 @@ public abstract class Heuristic
                 }
             }
         }
-
-
     }
     // How many goal cells are not yet covered by an object of the right type.
     public int h(State s)
@@ -129,6 +131,14 @@ public abstract class Heuristic
     private boolean checkIfAgentFinished(String agentColor, State s){
         boolean done = false;
 
+        if (agentFinished.get(agentColor)) return true;
+
+        Random rn = new Random();
+        if (rn.nextInt(20) != 5){
+            return false;
+        }
+
+
         for (int row = 1; row < s.goals.length - 1; row++)
         {
             for (int col = 1; col < s.goals[row].length - 1; col++) {
@@ -159,8 +169,10 @@ public abstract class Heuristic
 
             }
         }
+        agentFinished.put(agentColor, true);
         return done;
     }
+
 
     public int h_shortestdistance(State s) {
         double distance = 0;
@@ -183,38 +195,40 @@ public abstract class Heuristic
                                     if (color) {
                                         fromagent = s.agentRows[a] + " " + s.agentCols[a];
 
+                                        if (!agentFinished.containsKey(s.agentColors[a].toString())){
+                                            agentFinished.put(s.agentColors[a].toString(), false);
+                                        }
+                                        int agent_to_box = breathFirstTraversal(graph, fromagent, i + " " + j);
+                                        int box_to_goal = breathFirstTraversal(graph, i + " " + j, row + " " + col);
+                                        // When finished, ensure agent is close to box
+                                        //*0.5 : This is the behavior of agent after finished. If high (>1), the agent will stand still
+                                        //If low, the agent will dance a bit (so he does not block)
+                                        if (checkIfAgentFinished(s.agentColors[a].toString(),s)) agent_to_box_sum += agent_to_box;
 
-                                int agent_to_box = breathFirstTraversal(graph, fromagent, i + " " + j);
-                                int box_to_goal = breathFirstTraversal(graph, i + " " + j, row + " " + col);
-                                // When finished, ensure agent is close to box
-                                //*0.5 : This is the behavior of agent after finished. If high (>1), the agent will stand still
-                                //If low, the agent will dance a bit (so he does not block)
-                                if (checkIfAgentFinished(s.agentColors[a].toString(),s)) agent_to_box_sum +=
-                                                                                        agent_to_box * 0.5;
-                                if (box_to_goal != 0) {
-                                    box_to_goal_sum += box_to_goal;
-                                    agent_to_box_sum += agent_to_box;
-                                }
+                                        if (box_to_goal != 0) {
+                                            box_to_goal_sum += box_to_goal;
+                                            agent_to_box_sum += agent_to_box;
+                                        }
 
 
-                                break;
+                                        break;
                                     }
 
                                 }
 
+                            }
+                            if (color) break;
                         }
+                        // SOme reasons these breaks increase the complexity signficantly.
                         if (color) break;
                     }
-                        // SOme reasons these breaks increase the complexity signficantly.
-                    if (color) break;
                 }
-            }
 
 
                 else if ('0' <= goal && goal <= '9' &&
                         !(s.agentRows[goal - '0'] == row && s.agentCols[goal - '0'] == col))
                 {
-                        distance += breathFirstTraversal(graph, s.agentRows[goal - '0'] + " " + s.agentCols[goal - '0'], row + " " + col);
+                    distance += breathFirstTraversal(graph, s.agentRows[goal - '0'] + " " + s.agentCols[goal - '0'], row + " " + col);
                 }
             }
         }
