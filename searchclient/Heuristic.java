@@ -161,6 +161,70 @@ public abstract class Heuristic
         }
         return done;
     }
+    public int h_o(State s) {
+        double distance = 0;
+        String fromagent = "";
+
+        for (int agent=0; agent<s.jointAction.length;agent++) {
+            fromagent = s.agentRows[agent] + " " + s.agentCols[agent];
+            int distance_agent_box = 0;
+            int distance_box_goal = 0;
+            int distance_min_box = 0;
+            Boolean color = false;
+
+
+                for (int i = 0; i < s.boxes.length; i++) {
+                    for (int j = 0; j < s.boxes[i].length; j++) {
+                        char box = s.boxes[i][j];
+                        if (box!=0) {
+                            color = (s.agentColors[agent].toString() == s.boxColors[box-'A'].toString());
+
+                            if (color) {
+                                Point2D place = goalmap.get(box);
+                                int x = (int) place.getX();
+                                int y = (int) place.getY();
+                                distance_min_box = distance_box_goal += breathFirstTraversal(graph, i + " " + j, x + " " + y);
+
+                                    Action parent = s.parent.jointAction[agent];
+                                    Action child = s.jointAction[agent];
+
+
+                                    if (parent.type != child.type && ((parent.type == ActionType.Push) || (parent.type == ActionType.Pull))) {
+                                        distance_box_goal += distance_min_box * 2;
+                                        distance_agent_box += breathFirstTraversal(graph, fromagent, i + " " + j) * 2;
+
+                                    }
+
+                                    if (distance_min_box == 0) {
+
+                                    } else {
+                                        distance_box_goal += distance_min_box;
+                                        distance_agent_box += breathFirstTraversal(graph, fromagent, i + " " + j);
+
+                                    }
+
+
+
+                            }
+                            break;
+
+                        }
+                        if (color) break;
+                    }
+                    if (color) break;
+                }
+
+                if (distance_box_goal == 0){ //&& s.jointAction[agent].type!=ActionType.Pull&& s.jointAction[agent].type!=ActionType.Push) {
+
+                    distance+=distance_agent_box*0.5;
+                }
+                else {
+                    distance += distance_agent_box+distance_box_goal;
+                }
+            }
+
+        return (int)distance;
+    }
 
     public int h_shortestdistance(State s) {
         double distance = 0;
@@ -189,8 +253,9 @@ public abstract class Heuristic
                                 // When finished, ensure agent is close to box
                                 //*0.5 : This is the behavior of agent after finished. If high (>1), the agent will stand still
                                 //If low, the agent will dance a bit (so he does not block)
+                                if(box_to_goal==0) {
                                 if (checkIfAgentFinished(s.agentColors[a].toString(),s)) agent_to_box_sum +=
-                                                                                        agent_to_box * 0.5;
+                                                                                        agent_to_box * 0.5;}
                                 if (box_to_goal != 0) {
                                     box_to_goal_sum += box_to_goal;
                                     agent_to_box_sum += agent_to_box;
@@ -348,7 +413,7 @@ class HeuristicSuggestionGreedy
     @Override
     public int f(State s)
     {
-        return this.h_shortestdistance(s);
+        return this.h_o(s);
 
     }
 
